@@ -1,0 +1,54 @@
+﻿@using PersonalSite.Helpers
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abderrafaa Gahbiche">
+    <meta name="description" content="Abderrafaa Gahbiche, Web Developer, SharePoint, .Net">
+    <meta name="keywords" content="Abderrafaa Gahbiche, Web Developer, SharePoint, .Net">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="http://fonts.googleapis.com/css?family=Lobster" rel="stylesheet" type="text/css" />
+    <link href="http://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet" type="text/css" />
+    <link href="http://fonts.googleapis.com/css?family=Great+Vibes" rel="stylesheet" type="text/css">
+    <link href="@Url.Content(string.Format("~/Style/site.css?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content(string.Format("~/Style/style.css?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content(string.Format("~/Style/img.css?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/dragdrop.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/weatherwidget.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/tracking.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-1.10.2.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.min.js")" type="text/javascript"></script>
+    <script src=@Url.Content("~/Scripts/forecast.js") type="text/javascript"></script>
+    <script src=@Url.Content("~/Scripts/dragdrop.js") type="text/javascript"></script>
+    @RenderSection("AddStyle", required: false)
+    @RenderSection("Scripts", required: false)
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <div>
+                    <div class="pres">
+                        <div class="name">
+                            <a href="@Url.Action("Index", "Home", null, null)" data-enhance="false">
+                                <span data-enhance="false">Abderrafaa</span><br />
+                                <span data-enhance="false">Gahbiche</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="title"><span data-role="none">Web Developer</span></div>
+                    <div class="skills">
+                    </div>
+                </div>
+                <a href="@Url.Action("Contact", "Home", null, null)" data-role="none"><picture /></a>
+            </div>
+        </header>
+        <div class="main">
+            @RenderBody()
+        </div>
+        <footer>&nbsp;</footer>
+    </div>
+</body>
+</html>

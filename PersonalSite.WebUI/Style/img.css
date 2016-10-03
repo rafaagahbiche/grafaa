@@ -1,0 +1,141 @@
+﻿.img-list-container {
+    position: absolute;
+    width: 65%;
+    border: 1px solid #DEDCDC;
+}
+
+.img-list {
+    margin:auto;
+    position: relative;
+    overflow-x: hidden;
+    margin-bottom: 4em;
+}
+     
+.img-display {
+    position:relative;
+    float:left;
+    font-family:Calibri;
+    font-weight: bold;
+	border:1px solid transparent;
+}
+
+.img-display-focus {
+	background-color: #EBEBEB;
+	border-top: 1px solid #9D9DA2;
+	border-left: 1px solid #9D9DA2;
+	border-right: 1px solid #9D9DA2;
+	box-shadow: 4px 6px 8px 0 rgba(0, 0, 0, 0.4);
+}
+
+.img-display-onfront {
+    z-index:2;
+}
+
+.img-display div.edit-tools {
+/*	display:none;*/
+	position: absolute;
+	top: 0px;
+	left: 137px;
+	width:45px;
+}
+
+.img-display div.edit-tools > div {
+    cursor:pointer;
+	float:left;
+	width:47%;
+	margin-top: 2px;
+	text-align:center;
+}
+
+.img-display div.edit-tools > div > img {
+    width:13px;
+}
+
+.img-display div.edit-tools > div.hover {
+    background-color: #9D9DA2;
+    border-radius: 3px;
+}
+
+.img-display div.img-container {
+    margin-left: 9px;
+    margin-right: 9px;
+    margin-top: 25px;
+    padding-top:5px;
+    background-color:#EBEBEB;
+    border: 1px solid #9D9DA2;
+    width:160px;
+}
+
+.img-display div.img-container > img
+{
+    width:150px;
+    height:100px;
+    cursor:pointer;
+}
+
+.img-display div.img-details
+{
+    /*display:none;*/
+}
+.img-display div.img-details, 
+.img-display div.img-details-modify {
+    background-color:#EBEBEB;
+    text-align:left;
+    padding-left: 5px;
+    padding-right: 5px;
+    position:absolute;
+    width:170px;
+    border-bottom: 1px solid #9D9DA2;
+    border-left: 1px solid #9D9DA2;
+    border-right: 1px solid #9D9DA2;
+    box-shadow: 5px 4px 8px 0 rgba(0, 0, 0, 0.4);
+	z-index:1;
+}
+
+.img-display div.img-details > img {
+    display:none;
+    cursor:pointer;
+    width:12px;
+    height:12px;
+    top:0px;
+    right:0px;
+}
+
+.img-display div.img-details > span:first-child
+{
+    color:Black;
+    font-size:16px;
+    font-weight: bold;
+}
+
+.img-display div.img-details > p
+{
+    color:Black;
+    font-size:12px;
+}
+
+.img-details-modify {
+	font-size:12px;
+	font-weight:normal;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+.img-details-modify input[type=text] {
+    border:solid 1px #b6babf;
+	width:97%;
+}
+
+.img-details-modify textarea {
+	width:95%;
+    resize:none;
+    border:solid 1px #b6babf;
+    font-family:Calibri;
+    font-size: 14px;
+}
+
+/*Phone*/
+@media screen and (max-device-width: 480px) {
+    .img-list-container {
+        width: 100%;
+    }
+}

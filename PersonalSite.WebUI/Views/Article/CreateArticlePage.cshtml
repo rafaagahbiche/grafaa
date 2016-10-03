@@ -1,0 +1,48 @@
+﻿@model PersonalSite.DataAccess.ArticlePage
+
+@{
+    if (Model != null)
+    {
+        <div id="@string.Format("tab{0}", Model.Id)" class="article-page">
+            <div class="page-edit">
+                <div class="save-page">
+                    @Html.ActionLink("Save This one", "CreateArticlePage", null, new { @class = "save-page" })
+                </div>
+                @Html.TextArea("pageContent"+Model.Id, HttpUtility.HtmlDecode(Model.PageContent), new { @class = "content-edit" })
+            </div>
+            <div class="page-preview">
+                <div class="tools">
+                    <div class="edit"></div>
+                    <div class="delete"></div>
+                </div>
+                <div class="html-content">
+                    @if (!string.IsNullOrEmpty(Model.PageContent))
+                    {
+                        @Html.Raw(HttpUtility.HtmlDecode(Model.PageContent))
+                    }
+                </div>
+            </div>
+            <div class="loading hide-loading"><div><span>Saving page content...</span></div></div>
+            @Html.Hidden("articlePageIds", Model.Id)
+        </div>
+    }
+    else{           
+        <div id="tab0" class="article-page">
+            <div class="page-edit">
+                <div class="save-page">
+                    @Html.ActionLink("Save This one", "CreateArticlePage", null, new { @class = "save-page" })
+                </div>
+                @Html.TextArea("pageContent", new { @class = "content-edit" })
+            </div>
+            <div class="page-preview">
+                <div class="tools">
+                    <div class="edit"></div>
+                    <div class="delete"></div>
+                </div>
+                <div class="html-content" />
+            </div>
+            <div class="loading hide-loading"><div><span>Saving page content...</span></div></div>
+            @Html.Hidden("articlePageIds")
+        </div>
+        }
+}

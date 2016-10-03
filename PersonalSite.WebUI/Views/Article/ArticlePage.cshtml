@@ -1,0 +1,6 @@
+﻿@model System.String
+@{
+    <section class="article-page">
+        @Html.Raw(HttpUtility.HtmlDecode(Model))
+    </section>
+}

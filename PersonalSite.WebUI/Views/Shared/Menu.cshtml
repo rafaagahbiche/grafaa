@@ -1,0 +1,38 @@
+﻿@model IEnumerable<PersonalSite.DataAccess.Article>
+@{
+    <div class="menu">
+        <div>
+            <div class="menu-container">
+                <header>
+                    <div class="menu-header">
+                        <span class="menu-global menu-top"></span>
+                        <span class="menu-global menu-middle"></span>
+                        <span class="menu-global menu-bottom"></span>@*&mdash;*@
+                    </div>
+                </header>
+                <div class="menu-list">
+                    <ul class="menu">
+                        @{ string cat = string.Empty;}
+                        @if(!string.IsNullOrEmpty(Model.First().Category)){
+                            <li class="article-category"><span>@Model.First().Category</span></li>
+                            cat = Model.First().Category;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            if(!string.IsNullOrEmpty(item.Category) && !item.Category.Equals(cat)){
+                                <li class="article-category"><span>@item.Category</span></li>
+                                cat = item.Category;
+                            }
+                            <li class="article-link">
+                                <a href="@Url.Action("Details", "Article", new { title = item.Title.Replace(" ", "-").Replace("&", "and").ToLower(), Id = item.Id }, null)" data-enhance="false" data-role="none" >
+                                    <div>@item.Title</div>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

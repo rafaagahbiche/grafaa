@@ -1,0 +1,75 @@
+﻿@using System.Web.Mvc;
+@using PersonalSite.DataAccess;
+@using System.Collections.Generic
+
+@model Article
+
+@section AddStyle {
+    <link href="@Url.Content(string.Format("/Style/menu.css?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    @if (Request.Browser.IsMobileDevice) 
+    { 
+        <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    }
+}
+@section Scripts {
+    <script src=@Url.Content(string.Format("~/Scripts/menu.js?v={0}", DateTime.Now.ToString("ddMMyyyyhhmm"))) type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/Paginate/jquery.paginate.js")" type="text/javascript"></script>
+    <script src="@Url.Content(string.Format("~/Scripts/Paginate/img.js?v={0}", DateTime.Now.ToString("ddMMyyyyhh")))" type="text/javascript"></script>
+    @if (Request.Browser.IsMobileDevice)
+    {
+        <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    }
+}
+@{
+    ViewBag.Title = @Model != null ? @Model.Title : string.Empty;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<nav>
+    @{ Html.RenderAction("Menu", "Partial"); }
+</nav>
+<article>
+    <header class="manager-page-title">
+        @if (Model != null) { 
+        <div>
+            <h2><span>@Model.Title</span></h2>
+        </div>
+        <div><p><h3>@Model.Description</h3></p></div>
+        }
+    </header>
+    <div>
+        @if (Model != null && Model.ArticlePages != null && Model.ArticlePages.Count > 0) {
+            if (Model.ArticlePages.Count > 1) { 
+            <div class="pager-container">
+                <div id="pager">
+                    <ul>
+                        <li class="nav-prev"><span>&lsaquo;</span></li>
+                        <li class="nav-numbers"><span>1</span><span>&#x2F;</span><span>@Model.ArticlePages.Count</span></li>
+                        <li class="nav-next"><span>&rsaquo;</span></li>
+                    </ul>
+                </div>
+            </div>
+            }
+            <div class="img-list-container">
+                <div class="img-list">
+                    @if (Model != null) { 
+                    <ul id="pagination" data-bind="value: nbPictures">
+                        <li> 
+                            @{ int i = 0; }
+                            @foreach (var page in Model.ArticlePages)
+                            {
+                                if (i % 1 == 0 && i != 0)
+                                {
+                                    @:</li><li>
+                                }
+                                @Html.Partial("ArticlePage", page.PageContent)
+                                i++;
+                            }
+                        </li>
+                    </ul>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</article>

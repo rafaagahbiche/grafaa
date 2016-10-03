@@ -1,0 +1,49 @@
+﻿.infiniteCarousel {
+    width: 610px;
+    position: relative;
+    float:left;
+}
+
+.infiniteCarousel .wrapper {
+    width: 600px; /* .infiniteCarousel width - (.wrapper margin-left + .wrapper margin-right) */
+    overflow: auto;
+    min-height: 400px;
+    margin: 0 40px;
+    position: absolute;
+    top: 0;
+}
+
+.infiniteCarousel ul a img {
+    border: 5px solid #000;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+.infiniteCarousel .wrapper ul {
+    width: 9999px;
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    position: absolute;
+    top: 0;
+}
+
+.infiniteCarousel ul li {
+    display:block;
+    float:left;
+    padding: 10px;
+    height: 400px;
+    width: 600px;
+}
+
+.infiniteCarousel ul li a img {
+    display:block;
+}
+
+.carrousel_min {
+    position:absolute;
+    list-style: none outside none;
+    visibility:hidden;
+}
