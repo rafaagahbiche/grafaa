@@ -1,5 +1,5 @@
-﻿@using PersonalSite.DataAccess
-@model Article
+﻿@using PersonalSite.Service.ViewModel
+@model ArticleViewModel
 
 @section Scripts {
     <script src="@Url.Content("~/Scripts/tinymce/tinymce.min.js")" type="text/javascript"></script>
@@ -22,6 +22,11 @@
         <div id="article">
             @Html.ValidationSummary(true, string.Empty, new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
+            @for (var i = 0; i < Model.PagesIds.Count; i++)
+            {
+                @Html.HiddenFor(model => model.PagesIds[i]);
+            }
+            
         </div>
         <br />
         <br />
@@ -93,7 +98,7 @@
                     <div class="del-background"></div>
                     <div class="loading hide-loading"><div><span>Saving page content...</span></div></div>
                     <div class="hidden-bloc">
-                            @if (Model != null && Model.ArticlePages != null && Model.ArticlePages.Count > 0)
+                        @if (Model.ArticlePages.Count > 0)
                         {
                             foreach (var page in Model.ArticlePages)
                             {
@@ -105,23 +110,14 @@
                         }
                         else
                         {
-                                <div id="#tab-1" class="active">
-                                    <div></div>
-                                    @Html.TextBox("articlePageIds-1")
-                                </div>
+                            <div id="#tab-1" class="active">
+                                <div></div>
+                                @Html.TextBox("articlePageIds-1")
+                            </div>
                         }
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>

@@ -3,6 +3,7 @@ using PersonalSite.Service.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace PersonalSite.Service.Extension
 {
     public static class ExtensionHelper
     {
-        public static ArticleViewModel GetViewModel(this Article article)
+        public static ArticleViewModel GetViewModel(this Article article, bool loadPages)
         {
             var articleViewModel = new ArticleViewModel();
             if (article != null)
@@ -19,6 +20,16 @@ namespace PersonalSite.Service.Extension
                 articleViewModel.Title = article.Title;
                 articleViewModel.Description = article.Description;
                 articleViewModel.Category = article.Category;
+                if (loadPages)
+                {
+                    articleViewModel.ArticlePages = new List<ArticlePageViewModel>();
+                    articleViewModel.PagesIds = new List<int>();
+                    foreach (var articlePage in article.ArticlePages)
+                    {
+                        articleViewModel.ArticlePages.Add(articlePage.GetViewModel());
+                        articleViewModel.PagesIds.Add(articlePage.Id);
+                    }
+                }
             }
 
             return articleViewModel;
@@ -31,7 +42,7 @@ namespace PersonalSite.Service.Extension
             {
                 articlePageViewModel.Id = articlePage.Id;
                 articlePageViewModel.PageContent = articlePage.PageContent;
-                articlePageViewModel.Article = articlePage.Article.GetViewModel();
+                articlePageViewModel.ParentArticleId = articlePage.Article.Id;
             }
 
             return articlePageViewModel;

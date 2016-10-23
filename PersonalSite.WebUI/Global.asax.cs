@@ -6,9 +6,8 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
-using PersonalSite.WebUI.Models;
 using PersonalSite.WebUI.Controllers;
-using PersonalSite.WebUI.IoC;
+using PersonalSite.Infra;
 
 namespace PersonalSite.WebUI
 {
@@ -20,15 +19,8 @@ namespace PersonalSite.WebUI
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            ControllerBuilder.Current.SetControllerFactory(new UnityControllerFactory(GetUnityContainer()));
-        }
-        private IUnityContainer GetUnityContainer()
-        {
-            IUnityContainer container = new UnityContainer();
-            container.RegisterType<IArticleRepository, ArticleRepository>();
-            container.RegisterType<IController, ArticleController>("Article");
-            container.RegisterType<IController, ArticleController>("detail");
-            return container;
+            var ninject = new NinjectControllerFactory();
+            ControllerBuilder.Current.SetControllerFactory(new NinjectControllerFactory());
         }
     }
 }

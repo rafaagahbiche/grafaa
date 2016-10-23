@@ -1,22 +1,21 @@
-﻿using PersonalSite.WebUI.Models;
+﻿using PersonalSite.Service.Concrete;
 using System.Web.Mvc;
 
 namespace PersonalSite.WebUI.Controllers
 {
     public class PartialController : Controller
     {
-        // GET: Partial
-        public ActionResult Index()
+        private readonly ArticleService articleService;
+
+        public PartialController(ArticleService articleService)
         {
-            return View();
+            this.articleService = articleService;
         }
 
         [ChildActionOnly]
         public ActionResult Menu()
         {
-            ArticleRepository rep = new ArticleRepository();
-            var articles = rep.GetAllArticles();
-            return PartialView(articles);
+            return PartialView(articleService.GetAllArticles());
         }
     }
 }

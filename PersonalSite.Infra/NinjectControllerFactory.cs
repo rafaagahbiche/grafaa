@@ -2,6 +2,11 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using Ninject;
+using PersonalSite.Service.Abstract;
+using PersonalSite.Service.Concrete;
+using PersonalSite.Domain.Abstract;
+using PersonalSite.DataAccess;
+using PersonalSite.Domain.Concrete;
 
 
 namespace PersonalSite.Infra
@@ -28,7 +33,10 @@ namespace PersonalSite.Infra
 
         private void AddBindings()
         {
-            //ninjectKernel.Bind<IDoorService>().To<DoorService>();
+            ninjectKernel.Bind<IArticleService>().To<ArticleService>();
+            ninjectKernel.Bind<IDbContextFactory>().To<DbContextFactory>();
+            ninjectKernel.Bind<IRepo<Article>>().To<Repo<Article>>();
+            ninjectKernel.Bind<IRepo<ArticlePage>>().To<Repo<ArticlePage>>();
         }
     }
 }

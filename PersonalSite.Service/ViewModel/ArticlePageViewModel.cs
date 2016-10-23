@@ -6,5 +6,6 @@ namespace PersonalSite.Service.ViewModel
         public int Id { get; set; }
         public string PageContent { get; set; }
         public ArticleViewModel Article { get; set; }
+        public int ParentArticleId { get; set; }
     }
 }

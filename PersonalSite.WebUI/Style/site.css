@@ -85,16 +85,16 @@ div.page > header > div > div {
 }
 
 div.page > header div.pres {
-    text-shadow:0em 0.2em #89BFD8;
+    /*text-shadow:0em 0.2em #89BFD8;*/
 }
 
 div.page > header div.title {
-    text-shadow:0em 0.1em #89BFD8;
+    /*text-shadow:0em 0.1em #89BFD8;*/
 }
 
 div.page > header div.pres,  
 div.page > header div.title {
-    font-family: 'Lobster', Georgia, Times, serif;
+    /*font-family: 'Lobster', Georgia, Times, serif;*/
     color:#008ac9;
 }
 
@@ -117,7 +117,7 @@ div.page > header a {
 div.page > header div.name {
     margin-right:1em;
     float:left;
-    font-size:2em;
+    font-size:1.9em;
 }
     
 div.page > header div.name span {

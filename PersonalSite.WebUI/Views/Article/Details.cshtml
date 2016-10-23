@@ -1,21 +1,24 @@
 ﻿@using System.Web.Mvc;
-@using PersonalSite.DataAccess;
+@using PersonalSite.Service.ViewModel;
 @using System.Collections.Generic
 
-@model Article
+@model ArticleViewModel
 
 @section AddStyle {
-    <link href="@Url.Content(string.Format("/Style/menu.css?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("/Style/menu.css")" rel="stylesheet" type="text/css" />
+            @*// ?v={0}", DateTime.Now.ToString("ddMMyyyyhhmmsss")))" rel="stylesheet" type="text/css" />*@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    @if (Request.Browser.IsMobileDevice) 
+    @*@if (Request.Browser.IsMobileDevice) 
     { 
         <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-    }
+    }*@
 }
 @section Scripts {
-    <script src=@Url.Content(string.Format("~/Scripts/menu.js?v={0}", DateTime.Now.ToString("ddMMyyyyhhmm"))) type="text/javascript"></script>
+    <script src=@Url.Content(string.Format("~/Scripts/menu.js")) type="text/javascript"></script>
+    @*//?v={0}", DateTime.Now.ToString("ddMMyyyyhhmm"))) type="text/javascript"></script>*@
     <script src="@Url.Content("~/Scripts/Paginate/jquery.paginate.js")" type="text/javascript"></script>
-    <script src="@Url.Content(string.Format("~/Scripts/Paginate/img.js?v={0}", DateTime.Now.ToString("ddMMyyyyhh")))" type="text/javascript"></script>
+    <script src="@Url.Content(string.Format("~/Scripts/Paginate/img.js"))" type="text/javascript"></script>
+    @*//?v={0}", DateTime.Now.ToString("ddMMyyyyhh")))" type="text/javascript"></script>*@
     @if (Request.Browser.IsMobileDevice)
     {
         <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>

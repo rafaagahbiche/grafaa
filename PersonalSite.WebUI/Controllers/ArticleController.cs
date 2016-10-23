@@ -1,32 +1,22 @@
 ﻿using PersonalSite.DataAccess;
-using PersonalSite.WebUI.Models;
+using PersonalSite.Service.Abstract;
+using PersonalSite.Service.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Kaliko;
 
 namespace PersonalSite.WebUI.Controllers
 {
     public class ArticleController : Controller
     {
-        private IArticleRepository articleRepository;
-
-        public ArticleController(IArticleRepository articleRepository)
+        private readonly IArticleService articleService;
+        
+        public ArticleController(IArticleService articleService)
         {
-            this.articleRepository = articleRepository;
-        }
-
-        // GET: Article
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        public ActionResult Menu()
-        {
-            var articles = this.articleRepository.GetAllArticles();
-            return View(articles);
+            this.articleService = articleService;
         }
 
         public ActionResult DisplayEmptyCreateArticlePage()
@@ -40,7 +30,7 @@ namespace PersonalSite.WebUI.Controllers
             var pageId = postedFormData["id"];
             if (pageId != null)
             {
-                success = articleRepository.DeleteArticlePage(Convert.ToInt32(pageId));
+                success = articleService.DeleteArticlePage(Convert.ToInt32(pageId));
             }
 
             return Json(new
@@ -53,26 +43,32 @@ namespace PersonalSite.WebUI.Controllers
         {
             if (postedFormData == null)
             {
-                return PartialView("CreateArticlePage", new ArticlePage { Id = -1 });
+                return PartialView("CreateArticlePage", new ArticlePageViewModel { Id = -1 });
             }
             
             string content = postedFormData["content"];
             string pageId = postedFormData["id"];
             if (string.IsNullOrEmpty(pageId))
             {
-                return PartialView("CreateArticlePage", new ArticlePage { Id = -1 });
+                return PartialView("CreateArticlePage", new ArticlePageViewModel { Id = -1 });
             }
-            
+
+            // Old article + New Page
             if (Convert.ToInt32(pageId) == -1)
             {
                 string articleId = postedFormData["articleId"];
                 if (!string.IsNullOrEmpty(articleId))
                 {
-                    var article = this.articleRepository.GetArticleById(Convert.ToInt32(articleId));
-                    if (article != null)
+                    var articleViewModel = this.articleService.GetArticleById(Convert.ToInt32(articleId));
+                    if (articleViewModel != null)
                     {
-                        var articlePage = new ArticlePage { PageContent = content, Article = article };
-                        int id = this.articleRepository.AddArticlePage(articlePage);
+                        var articlePageViewModel = new ArticlePageViewModel { 
+                            PageContent = content, 
+                            Article = articleViewModel, 
+                            ParentArticleId = articleViewModel.Id 
+                        };
+                        
+                        int id = this.articleService.CreateArticlePage(articlePageViewModel);
                         string status = id.Equals(-1) ? "succeded" : "failed";
                         return Json(new
                         {
@@ -84,9 +80,10 @@ namespace PersonalSite.WebUI.Controllers
                 }
             }
 
-            var pageToUpdate = this.articleRepository.GetArticlePageById(Convert.ToInt32(pageId));
-            pageToUpdate.PageContent = content;
-            this.articleRepository.UpdateItems();
+            // Old article + Update Page
+            var oldArticlePageViewModel = this.articleService.GetArticlePageById(Convert.ToInt32(pageId));
+            oldArticlePageViewModel.PageContent = content;
+            this.articleService.UpdatePageContent(oldArticlePageViewModel);
             return Json(new
             {
                 Status = "Page updated",
@@ -95,6 +92,7 @@ namespace PersonalSite.WebUI.Controllers
             });
         }
 
+        #region Details
         public ActionResult Details()
         {
             return View("Error");
@@ -104,45 +102,50 @@ namespace PersonalSite.WebUI.Controllers
         [Route("pages/{title}-{id}")]
         public ActionResult Details(int id)
         {
-            Article article = this.articleRepository.GetArticleById(id);
-            if (article != null)
+            try
             {
-                return View(article);
+                var article = this.articleService.GetArticleById(id);
+                if (article != null)
+                {
+                    return View(article);
+                }
+
+                return View();
             }
-        
-            return View("Error");
+            catch (Exception ex)
+            {
+                Kaliko.Logger.Write(ex, Logger.Severity.Critical);
+            }
+            
+            return View();
         }
 
-        // GET: Article/Create
+        #endregion
+
+        #region Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Article/Create
         [HttpPost, ValidateInput(false)]
-        public ActionResult Create(Article article, ICollection<int> articlePageIds)
+        public ActionResult Create(Service.ViewModel.ArticleViewModel articleViewModel, ICollection<int> articlePageIds)
         {
             try
             {
-                if (article != null)
+                if (articleViewModel != null)
                 {
                     if (articlePageIds != null)
                     {
                         var articlePages = new List<ArticlePage>();
+                        var articleId = this.articleService.Create(articleViewModel);
                         foreach (var pageId in articlePageIds)
                         {
-                            var articlePage = this.articleRepository.GetArticlePageById(pageId);
-                            if (articlePage != null)
-                            {
-                                articlePages.Add(this.articleRepository.GetArticlePageById(pageId));
-                            }
+                            this.articleService.AddArticleToPage(pageId, articleId);
                         }
-
-                        article.ArticlePages = articlePages;
                     }
-                    this.articleRepository.AddArticle(article);
-                    return RedirectToRoute("Manager", new { id = article.Id });
+
+                    return RedirectToRoute("Manager", new { id = articleViewModel.Id });
                 }
                 return View("Create");
             }
@@ -152,19 +155,22 @@ namespace PersonalSite.WebUI.Controllers
             }
         }
 
+        #endregion
+
+        #region Edit article
+
         public ActionResult Edit()
         {
             return View("Error");
         }
 
-        // GET: Article/Edit/5
         [Route("pages/edit/{id}")]
         public ActionResult Edit(int id)
         {
             // TODO if article not found 
             if (!id.Equals(0) && !id.Equals(-1))
             {
-                var article = this.articleRepository.GetArticleById(id);
+                var article = this.articleService.GetArticleById(id);
                 return View(article);
             }
 
@@ -174,39 +180,25 @@ namespace PersonalSite.WebUI.Controllers
         // POST: Article/Edit/5
         [HttpPost, ValidateInput(false)]
         [Route("pages/edit/{id}")]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(ArticleViewModel article, FormCollection collection)
         {
             try
             {
-                // TODO: Add update logic here
-                string pageId = collection["id"];
-
-                var article = this.articleRepository.GetArticleById(Int32.Parse(pageId));
-                article.Description = collection["Description"] != null
-                    ? collection["Description"].ToString() : string.Empty;
-
-                article.Title = collection["Title"] != null
-                    ? collection["Title"].ToString() : string.Empty;
                 if (collection["articlePageIds"] != null)
                 {
                     var pageIds = collection["articlePageIds"].Split(',');
-                    foreach(var tmpId in pageIds){
-                        int intId = Convert.ToInt32(tmpId);
-                        if (intId > 0)
+                    var s = Array.ConvertAll(pageIds, Int32.Parse);
+                    var newPageIds = article.PagesIds.Except(s);
+                    if (newPageIds.Count() > 0)
+                    {
+                        newPageIds.ToList().ForEach(id =>
                         {
-                            var pageAlreadyLinked = article.ArticlePages.Any(x => intId.Equals(x.Id));
-                            if (!pageAlreadyLinked)
-                            {
-                                var articlePage = articleRepository.GetArticlePageById(intId);
-                                if (articlePage != null)
-                                {
-                                    article.ArticlePages.Add(articlePage);
-                                }
-                            }
-                        }
+                            articleService.AddArticleToPage(article.Id, id);
+                        });
                     }
                 }
-                this.articleRepository.UpdateItems();
+
+                article = this.articleService.UpdateArticleDetails(article);
                 return View(article);
             }
             catch
@@ -215,13 +207,14 @@ namespace PersonalSite.WebUI.Controllers
             }
         }
 
-        // GET: Article/Delete/5
+        #endregion
+
+        #region Delete article
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: Article/Delete/5
         [HttpPost]
         public ActionResult Delete(int id, FormCollection collection)
         {
@@ -235,5 +228,6 @@ namespace PersonalSite.WebUI.Controllers
                 return View();
             }
         }
+        #endregion
     }
 }

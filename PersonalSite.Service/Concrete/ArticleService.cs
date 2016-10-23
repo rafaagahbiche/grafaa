@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kaliko;
 
 namespace PersonalSite.Service.Concrete
 {
@@ -28,11 +29,11 @@ namespace PersonalSite.Service.Concrete
             try
             {
                 var articleObject = this.articleRepo.Get(id);
-                articleViewModel = articleObject.GetViewModel();
+                articleViewModel = articleObject.GetViewModel(true);
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Kaliko.Logger.Write(ex, Logger.Severity.Critical);
             }
 
             return articleViewModel;
@@ -41,13 +42,10 @@ namespace PersonalSite.Service.Concrete
         public IEnumerable<ArticleViewModel> GetAllArticles()
         {
             var articles = this.articleRepo.GetAll();
-            var articlesList = new List<ArticleViewModel>();
             foreach (var article in articles)
             {
-                articlesList.Add(article.GetViewModel());
+                yield return article.GetViewModel(false);
             }
-
-            return articlesList;
         }
 
         public ArticlePageViewModel GetArticlePageById(int id)
@@ -66,8 +64,9 @@ namespace PersonalSite.Service.Concrete
             return articlePageViewModel;
         }
 
-        public void Create(ArticleViewModel articleViewModel)
+        public int Create(ArticleViewModel articleViewModel)
         {
+            int id = -1;
             try
             {
                 var articleObject = new Article()
@@ -79,6 +78,26 @@ namespace PersonalSite.Service.Concrete
 
                 this.articleRepo.Insert(articleObject);
                 this.articleRepo.Save();
+                id = articleObject.Id;
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+            }
+
+            return id;
+        }
+
+        public void UpdatePageContent(ArticlePageViewModel articlePageViewModel)
+        {
+            try
+            {
+                var articlePageObject = this.articlePageRepo.Get(articlePageViewModel.Id);
+                if (articlePageObject != null)
+                {
+                    articlePageObject.PageContent = articlePageViewModel.PageContent;
+                    this.articlePageRepo.Save();
+                }
             }
             catch (Exception ex)
             {
@@ -86,14 +105,47 @@ namespace PersonalSite.Service.Concrete
             }
         }
 
-        public int AddArticlePage(ArticlePageViewModel articlePageViewModel)
+        public ArticleViewModel UpdateArticleDetails(ArticleViewModel articleViewModel)
+        {
+            var articleObject = this.articleRepo.Get(articleViewModel.Id);
+            if (articleObject != null)
+            {
+                try
+                {
+                    articleObject.Description = articleViewModel.Description;
+                    articleObject.Title = articleViewModel.Title;
+                    articleObject.Category = articleViewModel.Category;
+                    articleRepo.Save();
+                }
+                catch (Exception ex)
+                {
+                    Kaliko.Logger.Write(ex, Logger.Severity.Critical);
+                }
+            }
+
+            articleViewModel = articleObject.GetViewModel(true);
+            return articleViewModel;
+        }
+
+        public void AddArticleToPage(int articlePageId, int articleId)
+        {
+            var articlePageObject = articlePageRepo.Get(articlePageId);
+            if (articlePageObject != null)
+            {
+                articlePageObject.Article = this.articleRepo.Get(articleId);
+                articlePageRepo.Save();
+            }
+        }
+
+        public int CreateArticlePage(ArticlePageViewModel articlePageViewModel)
         {
             int idRet = -1;
             try
             {
                 var articlePageObject = new ArticlePage()
                 {
-                    Article = articleRepo.Get(articlePageViewModel.Article.Id),
+                    Article = articlePageViewModel.Article != null 
+                            ? articleRepo.Get(articlePageViewModel.Article.Id) : null,
                     PageContent = articlePageViewModel.PageContent
                 };
 
@@ -103,7 +155,7 @@ namespace PersonalSite.Service.Concrete
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Kaliko.Logger.Write(ex, Logger.Severity.Critical);
             }
 
             return idRet;

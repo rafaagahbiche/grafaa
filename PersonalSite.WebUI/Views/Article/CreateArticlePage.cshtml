@@ -1,4 +1,4 @@
-﻿@model PersonalSite.DataAccess.ArticlePage
+﻿@model PersonalSite.Service.ViewModel.ArticlePageViewModel
 
 @{
     if (Model != null)
@@ -8,7 +8,7 @@
                 <div class="save-page">
                     @Html.ActionLink("Save This one", "CreateArticlePage", null, new { @class = "save-page" })
                 </div>
-                @Html.TextArea("pageContent"+Model.Id, HttpUtility.HtmlDecode(Model.PageContent), new { @class = "content-edit" })
+                @Html.TextArea("pageContent" + Model.Id, HttpUtility.HtmlDecode(Model.PageContent), new { @class = "content-edit" })
             </div>
             <div class="page-preview">
                 <div class="tools">
