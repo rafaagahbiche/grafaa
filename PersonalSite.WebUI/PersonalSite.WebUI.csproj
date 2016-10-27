@@ -172,9 +172,8 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PartialController.cs" />
@@ -387,6 +386,7 @@
     <Content Include="Style\font\icomoon.eot" />
     <Content Include="Style\font\icomoon.ttf" />
     <Content Include="Style\font\icomoon.woff" />
+    <Content Include="Views\Account\Login.cshtml" />
     <None Include="Web.Internet.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

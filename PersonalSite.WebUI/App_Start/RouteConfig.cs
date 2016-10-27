@@ -38,6 +38,11 @@ namespace PersonalSite.WebUI
                 "contact",
                 new { controller = "Home", action = "Contact" }
             );
+            routes.MapRoute(
+                "Account",
+                "Login",
+                new { controller = "Account", action = "Login" }
+            );
         }
     }
 }

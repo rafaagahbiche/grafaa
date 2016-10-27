@@ -37,6 +37,7 @@ namespace PersonalSite.Infra
             ninjectKernel.Bind<IDbContextFactory>().To<DbContextFactory>();
             ninjectKernel.Bind<IRepo<Article>>().To<Repo<Article>>();
             ninjectKernel.Bind<IRepo<ArticlePage>>().To<Repo<ArticlePage>>();
+            ninjectKernel.Bind<IAuthProvider>().To<FormsAuthProvider>();
         }
     }
 }

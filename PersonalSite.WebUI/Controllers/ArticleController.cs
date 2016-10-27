@@ -123,6 +123,8 @@ namespace PersonalSite.WebUI.Controllers
         #endregion
 
         #region Create
+
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -147,6 +149,7 @@ namespace PersonalSite.WebUI.Controllers
 
                     return RedirectToRoute("Manager", new { id = articleViewModel.Id });
                 }
+
                 return View("Create");
             }
             catch
@@ -158,12 +161,13 @@ namespace PersonalSite.WebUI.Controllers
         #endregion
 
         #region Edit article
-
+        [Authorize]
         public ActionResult Edit()
         {
             return View("Error");
         }
 
+        [Authorize]
         [Route("pages/edit/{id}")]
         public ActionResult Edit(int id)
         {
