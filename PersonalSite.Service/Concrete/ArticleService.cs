@@ -1,17 +1,15 @@
-﻿using PersonalSite.DataAccess;
-using PersonalSite.Domain.Abstract;
-using PersonalSite.Service.Abstract;
-using PersonalSite.Service.ViewModel;
-using PersonalSite.Service.Extension;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Kaliko;
-
+﻿
 namespace PersonalSite.Service.Concrete
 {
+    using PersonalSite.DataAccess;
+    using PersonalSite.Domain.Abstract;
+    using PersonalSite.Service.Abstract;
+    using PersonalSite.Service.ViewModel;
+    using PersonalSite.Service.Extension;
+    using System;
+    using System.Collections.Generic;
+    using Kaliko;
+
     public class ArticleService : IArticleService
     {
         private readonly IRepo<Article> articleRepo;
@@ -23,7 +21,7 @@ namespace PersonalSite.Service.Concrete
         }
 
 
-        public ArticleViewModel GetArticleById(int id)
+        public ArticleViewModel Get(int id)
         {
             ArticleViewModel articleViewModel = null;
             try
@@ -39,7 +37,7 @@ namespace PersonalSite.Service.Concrete
             return articleViewModel;
         }
 
-        public IEnumerable<ArticleViewModel> GetAllArticles()
+        public IEnumerable<ArticleViewModel> GetAll()
         {
             var articles = this.articleRepo.GetAll();
             foreach (var article in articles)
@@ -48,13 +46,16 @@ namespace PersonalSite.Service.Concrete
             }
         }
 
-        public ArticlePageViewModel GetArticlePageById(int id)
+        public PageViewModel GetArticlePageById(int id)
         {
-            var articlePageViewModel = new ArticlePageViewModel();
+            PageViewModel articlePageViewModel = null;
             try
             {
                 var articlePageObject = this.articlePageRepo.Get(id);
-                articlePageViewModel = articlePageObject.GetViewModel();
+                if (articlePageObject != null)
+                {
+                    articlePageViewModel = articlePageObject.GetViewModel();
+                }
             }
             catch (Exception ex)
             {
@@ -66,7 +67,7 @@ namespace PersonalSite.Service.Concrete
 
         public int Create(ArticleViewModel articleViewModel)
         {
-            int id = -1;
+            int newArticleId = -1;
             try
             {
                 var articleObject = new Article()
@@ -76,36 +77,40 @@ namespace PersonalSite.Service.Concrete
                     Category = articleViewModel.Category
                 };
 
-                this.articleRepo.Insert(articleObject);
+                var newArticleObject = this.articleRepo.Insert(articleObject);
                 this.articleRepo.Save();
-                id = articleObject.Id;
+                newArticleId = newArticleObject.Id;
             }
             catch (Exception ex)
             {
                 Console.Write(ex.Message);
             }
 
-            return id;
+            return newArticleId;
         }
 
-        public void UpdatePageContent(ArticlePageViewModel articlePageViewModel)
+        public bool UpdatePageContent(PageViewModel articlePageViewModel)
         {
+            var updateSucceeded = false;
             try
             {
-                var articlePageObject = this.articlePageRepo.Get(articlePageViewModel.Id);
+                var articlePageObject = this.articlePageRepo.Get(articlePageViewModel.PageId);
                 if (articlePageObject != null)
                 {
                     articlePageObject.PageContent = articlePageViewModel.PageContent;
                     this.articlePageRepo.Save();
+                    updateSucceeded = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Kaliko.Logger.Write(ex, Logger.Severity.Critical);
             }
+
+            return updateSucceeded;
         }
 
-        public ArticleViewModel UpdateArticleDetails(ArticleViewModel articleViewModel)
+        public ArticleViewModel Update(ArticleViewModel articleViewModel)
         {
             var articleObject = this.articleRepo.Get(articleViewModel.Id);
             if (articleObject != null)
@@ -137,28 +142,33 @@ namespace PersonalSite.Service.Concrete
             }
         }
 
-        public int CreateArticlePage(ArticlePageViewModel articlePageViewModel)
+        public int CreateArticlePage(PageViewModel articlePageViewModel)
         {
-            int idRet = -1;
+            int newPageId = -1;
             try
             {
                 var articlePageObject = new ArticlePage()
                 {
-                    Article = articlePageViewModel.Article != null 
-                            ? articleRepo.Get(articlePageViewModel.Article.Id) : null,
                     PageContent = articlePageViewModel.PageContent
                 };
 
-                this.articlePageRepo.Insert(articlePageObject);
+                var articleObject = articleRepo.Get(articlePageViewModel.ParentArticleId);
+                if (articleObject != null)
+                {
+                    articlePageObject.Article = articleObject;
+                    articlePageObject.ParentArticle = articlePageViewModel.ParentArticleId; 
+                }
+
+                var newArticlePageObj = this.articlePageRepo.Insert(articlePageObject);
                 this.articlePageRepo.Save();
-                idRet = articlePageObject.Id;
+                newPageId = newArticlePageObj.Id;
             }
             catch (Exception ex)
             {
                 Kaliko.Logger.Write(ex, Logger.Severity.Critical);
             }
 
-            return idRet;
+            return newPageId;
         }
 
         public bool DeleteArticlePage(int id)

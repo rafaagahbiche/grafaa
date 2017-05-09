@@ -1,14 +1,10 @@
-﻿using PersonalSite.DataAccess;
-using PersonalSite.Service.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PersonalSite.Service.Extension
 {
+    using PersonalSite.DataAccess;
+    using PersonalSite.Service.ViewModel;
+    using System.Collections.Generic;
+
     public static class ExtensionHelper
     {
         public static ArticleViewModel GetViewModel(this Article article, bool loadPages)
@@ -22,7 +18,7 @@ namespace PersonalSite.Service.Extension
                 articleViewModel.Category = article.Category;
                 if (loadPages)
                 {
-                    articleViewModel.ArticlePages = new List<ArticlePageViewModel>();
+                    articleViewModel.ArticlePages = new List<PageViewModel>();
                     articleViewModel.PagesIds = new List<int>();
                     foreach (var articlePage in article.ArticlePages)
                     {
@@ -35,14 +31,17 @@ namespace PersonalSite.Service.Extension
             return articleViewModel;
         }
 
-        public static ArticlePageViewModel GetViewModel(this ArticlePage articlePage)
+        public static PageViewModel GetViewModel(this ArticlePage articlePage)
         {
-            var articlePageViewModel = new ArticlePageViewModel();
+            PageViewModel articlePageViewModel = null;
             if (articlePage != null)
             {
-                articlePageViewModel.Id = articlePage.Id;
-                articlePageViewModel.PageContent = articlePage.PageContent;
-                articlePageViewModel.ParentArticleId = articlePage.Article.Id;
+                articlePageViewModel = new PageViewModel()
+                {
+                    PageId = articlePage.Id,
+                    PageContent = articlePage.PageContent,
+                    ParentArticleId = articlePage.Article.Id
+                };
             }
 
             return articlePageViewModel;

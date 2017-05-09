@@ -5,14 +5,14 @@ namespace PersonalSite.Service.Abstract
 {
     public interface IArticleService
     {
-        ArticleViewModel GetArticleById(int id);
-        ArticlePageViewModel GetArticlePageById(int id);
-        IEnumerable<ArticleViewModel> GetAllArticles();
+        ArticleViewModel Get(int id);
+        PageViewModel GetArticlePageById(int id);
+        IEnumerable<ArticleViewModel> GetAll();
         int Create(ArticleViewModel articleViewModel);
-        int CreateArticlePage(ArticlePageViewModel articlePageViewModel);
+        int CreateArticlePage(PageViewModel articlePageViewModel);
         bool DeleteArticlePage(int id);
         void AddArticleToPage(int articlePageId, int articleId);
-        void UpdatePageContent(ArticlePageViewModel articlePageViewModel);
-        ArticleViewModel UpdateArticleDetails(ArticleViewModel articleViewModel);
+        bool UpdatePageContent(PageViewModel articlePageViewModel);
+        ArticleViewModel Update(ArticleViewModel articleViewModel);
     }
 }

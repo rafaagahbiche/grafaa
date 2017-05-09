@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PersonalSite.Domain.Abstract;
-using PersonalSite.DataAccess;
-
+﻿
 namespace PersonalSite.Domain.Concrete
 {
-    public class DbContextFactory: IDbContextFactory
+    using PersonalSite.DataAccess;
+    using PersonalSite.Domain.Abstract;
+    using System;
+    using System.Data.Entity;
+
+    public class DbContextFactory : IDbContextFactory
     {
         private readonly GrafaaEntities dbContext;
         public DbContextFactory()

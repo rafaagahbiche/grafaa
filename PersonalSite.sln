@@ -13,28 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalSite.Infra", "Perso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalSite.Domain", "PersonalSite.Domain\PersonalSite.Domain.csproj", "{D867FD02-9846-4715-AB7E-3A708781E95A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalSite.Test", "PersonalSite.Test\PersonalSite.Test.csproj", "{AD19767F-F3B0-44EE-8993-5B7341F5D260}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs37
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = PersonalSite\\PersonalSite.WebUI.csproj
-		SccProjectName1 = PersonalSite
-		SccLocalPath1 = PersonalSite
-		SccProjectUniqueName2 = DataAccess\\PersonalSite.DataAccess.csproj
-		SccProjectName2 = DataAccess
-		SccLocalPath2 = DataAccess
-		SccProjectUniqueName3 = PersonalSite.Service\\PersonalSite.Service.csproj
-		SccProjectName3 = PersonalSite.Service
-		SccLocalPath3 = PersonalSite.Service
-		SccProjectUniqueName4 = PersonalSite.Infra\\PersonalSite.Infra.csproj
-		SccProjectName4 = PersonalSite.Infra
-		SccLocalPath4 = PersonalSite.Infra
-		SccProjectUniqueName5 = PersonalSite.Domain\\PersonalSite.Domain.csproj
-		SccProjectName5 = PersonalSite.Domain
-		SccLocalPath5 = PersonalSite.Domain
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -60,6 +41,10 @@ Global
 		{D867FD02-9846-4715-AB7E-3A708781E95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D867FD02-9846-4715-AB7E-3A708781E95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D867FD02-9846-4715-AB7E-3A708781E95A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD19767F-F3B0-44EE-8993-5B7341F5D260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD19767F-F3B0-44EE-8993-5B7341F5D260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD19767F-F3B0-44EE-8993-5B7341F5D260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD19767F-F3B0-44EE-8993-5B7341F5D260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,15 +1,16 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Omu.ValueInjecter;
-using PersonalSite.Domain.Abstract;
-using PersonalSite.DataAccess;
-
+﻿
 namespace PersonalSite.Domain.Concrete
 {
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Omu.ValueInjecter;
+    using PersonalSite.Domain.Abstract;
+    using PersonalSite.DataAccess;
+
     public class Repo<T> : IRepo<T> where T : Entity, new()
     {
-        protected readonly GrafaaEntities dbContext ;
+        protected readonly GrafaaEntities dbContext;
 
         public Repo(IDbContextFactory dbContextFactory)
         {
@@ -37,7 +38,7 @@ namespace PersonalSite.Domain.Concrete
         public T Get(int id)
         {
             T entity = null;
-            entity =    dbContext.Set<T>().Find(id);
+            entity = dbContext.Set<T>().Find(id);
             return entity;
         }
 

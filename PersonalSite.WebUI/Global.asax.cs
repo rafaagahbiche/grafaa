@@ -19,8 +19,8 @@ namespace PersonalSite.WebUI
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            var ninject = new NinjectControllerFactory();
-            ControllerBuilder.Current.SetControllerFactory(new NinjectControllerFactory());
+            //var ninject = new NinjectControllerFactory();
+            //ControllerBuilder.Current.SetControllerFactory(new NinjectControllerFactory());
         }
     }
 }

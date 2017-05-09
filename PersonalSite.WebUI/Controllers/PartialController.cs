@@ -15,7 +15,7 @@ namespace PersonalSite.WebUI.Controllers
         [ChildActionOnly]
         public ActionResult Menu()
         {
-            return PartialView(articleService.GetAllArticles());
+            return PartialView(articleService.GetAll());
         }
     }
 }

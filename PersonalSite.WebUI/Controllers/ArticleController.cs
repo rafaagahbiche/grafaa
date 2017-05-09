@@ -1,15 +1,15 @@
-﻿using PersonalSite.DataAccess;
-using PersonalSite.Service.Abstract;
-using PersonalSite.Service.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Kaliko;
-
-namespace PersonalSite.WebUI.Controllers
+﻿namespace PersonalSite.WebUI.Controllers
 {
+    using PersonalSite.Service.Abstract;
+    using PersonalSite.Service.ViewModel;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Web.Mvc;
+    using Kaliko;
+    using System.Net;
+    using System.IO;
+
     public class ArticleController : Controller
     {
         private readonly IArticleService articleService;
@@ -19,77 +19,91 @@ namespace PersonalSite.WebUI.Controllers
             this.articleService = articleService;
         }
 
-        public ActionResult DisplayEmptyCreateArticlePage()
+        public ActionResult DeleteArticlePage(PageViewModel pageViewModel)
         {
-            return PartialView("CreateArticlePage", new ArticlePage { Id = -1 });
-        }
-
-        public ActionResult DeleteArticlePage(FormCollection postedFormData)
-        {
-            bool success = false;
-            var pageId = postedFormData["id"];
-            if (pageId != null)
+            if (pageViewModel != null && pageViewModel.PageId > 0)
             {
-                success = articleService.DeleteArticlePage(Convert.ToInt32(pageId));
+                articleService.DeleteArticlePage(pageViewModel.PageId);
+                return RedirectToAction("Edit", new { id = pageViewModel.ParentArticleId });
             }
 
-            return Json(new
-            {
-                Status = success
-            }); ;
+            return View("Edit");
         }
-        
-        public ActionResult CreateArticlePage(FormCollection postedFormData)
+
+        [HttpGet]
+        public PartialViewResult ShowPageContent(int pageId, int articleId)
         {
-            if (postedFormData == null)
+            var pageViewModel = this.articleService.GetArticlePageById(pageId);
+            if (pageViewModel != null)
             {
-                return PartialView("CreateArticlePage", new ArticlePageViewModel { Id = -1 });
+                return PartialView("CreateArticlePage", pageViewModel);
             }
-            
-            string content = postedFormData["content"];
-            string pageId = postedFormData["id"];
-            if (string.IsNullOrEmpty(pageId))
+            else
             {
-                return PartialView("CreateArticlePage", new ArticlePageViewModel { Id = -1 });
+                return PartialView("CreateArticlePage", new PageViewModel() { PageId = -1, ParentArticleId = articleId });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CreateArticlePage(PageViewModel pageViewModel)
+        {
+            if (pageViewModel == null || pageViewModel.PageId == 0)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError; 
+                return Json(new 
+                { 
+                    success = false, 
+                    responseText = "The view model is empty." 
+                }, JsonRequestBehavior.AllowGet);
             }
 
             // Old article + New Page
-            if (Convert.ToInt32(pageId) == -1)
+            if (pageViewModel.PageId == -1)
             {
-                string articleId = postedFormData["articleId"];
-                if (!string.IsNullOrEmpty(articleId))
+                pageViewModel.PageId = this.articleService.CreateArticlePage(pageViewModel);
+                if (pageViewModel.PageId == -1)
                 {
-                    var articleViewModel = this.articleService.GetArticleById(Convert.ToInt32(articleId));
-                    if (articleViewModel != null)
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new
                     {
-                        var articlePageViewModel = new ArticlePageViewModel { 
-                            PageContent = content, 
-                            Article = articleViewModel, 
-                            ParentArticleId = articleViewModel.Id 
-                        };
-                        
-                        int id = this.articleService.CreateArticlePage(articlePageViewModel);
-                        string status = id.Equals(-1) ? "succeded" : "failed";
-                        return Json(new
-                        {
-                            Status = status,
-                            Id = id,
-                            Content = HttpUtility.HtmlDecode(content)
-                        });
-                    }
+                        success = false,
+                        responseText = "Something went wrong. Please reload the page."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    var viewResult = this.RenderViewToString("EditPageInfos", pageViewModel);
+                    return Json(new 
+                    { 
+                        success = true, 
+                        responseText = "New page was created successfully",
+                        obj = viewResult
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
-
-            // Old article + Update Page
-            var oldArticlePageViewModel = this.articleService.GetArticlePageById(Convert.ToInt32(pageId));
-            oldArticlePageViewModel.PageContent = content;
-            this.articleService.UpdatePageContent(oldArticlePageViewModel);
-            return Json(new
+            else
             {
-                Status = "Page updated",
-                Id = pageId,
-                Content = HttpUtility.HtmlDecode(content)
-            });
+                var updateSucceeded = this.articleService.UpdatePageContent(pageViewModel);
+                if (updateSucceeded == false)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new
+                    {
+                        success = false,
+                        responseText = "Something went wrong. Please reload the page."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    var viewResult = this.RenderViewToString("EditPageInfos", pageViewModel);
+                    return Json(new 
+                    { 
+                        success = true, 
+                        responseText = "Page was updated successfully.",
+                        obj = viewResult
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
         }
 
         #region Details
@@ -98,13 +112,12 @@ namespace PersonalSite.WebUI.Controllers
             return View("Error");
         }
 
-        // GET: Article/Details/5
         [Route("pages/{title}-{id}")]
         public ActionResult Details(int id)
         {
             try
             {
-                var article = this.articleService.GetArticleById(id);
+                var article = this.articleService.Get(id);
                 if (article != null)
                 {
                     return View(article);
@@ -131,23 +144,23 @@ namespace PersonalSite.WebUI.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult Create(Service.ViewModel.ArticleViewModel articleViewModel, ICollection<int> articlePageIds)
+        public ActionResult Create(Service.ViewModel.ArticleViewModel articleViewModel
+            , ICollection<int> articlePageIds)
         {
             try
             {
                 if (articleViewModel != null)
                 {
+                    articleViewModel.Id = this.articleService.Create(articleViewModel);
                     if (articlePageIds != null)
                     {
-                        var articlePages = new List<ArticlePage>();
-                        var articleId = this.articleService.Create(articleViewModel);
                         foreach (var pageId in articlePageIds)
                         {
-                            this.articleService.AddArticleToPage(pageId, articleId);
+                            this.articleService.AddArticleToPage(pageId, articleViewModel.Id);
                         }
                     }
 
-                    return RedirectToRoute("Manager", new { id = articleViewModel.Id });
+                    return RedirectToAction("Edit", new { id = articleViewModel.Id });
                 }
 
                 return View("Create");
@@ -174,8 +187,16 @@ namespace PersonalSite.WebUI.Controllers
             // TODO if article not found 
             if (!id.Equals(0) && !id.Equals(-1))
             {
-                var article = this.articleService.GetArticleById(id);
-                return View(article);
+                var article = this.articleService.Get(id);
+                if (article != null)
+                {
+                    return View(article);
+                }
+                else
+                {
+                    Logger.Write("Article is null");
+                    return View("Error");
+                }
             }
 
             return View();
@@ -188,7 +209,7 @@ namespace PersonalSite.WebUI.Controllers
         {
             try
             {
-                if (collection["articlePageIds"] != null)
+                if (collection != null && collection["articlePageIds"] != null)
                 {
                     var pageIds = collection["articlePageIds"].Split(',');
                     var s = Array.ConvertAll(pageIds, Int32.Parse);
@@ -202,11 +223,12 @@ namespace PersonalSite.WebUI.Controllers
                     }
                 }
 
-                article = this.articleService.UpdateArticleDetails(article);
+                article = this.articleService.Update(article);
                 return View(article);
             }
-            catch
+            catch(Exception ex)
             {
+                Logger.Write(ex, Logger.Severity.Major);
                 return View();
             }
         }

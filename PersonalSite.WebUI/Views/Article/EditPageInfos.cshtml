@@ -1,0 +1,8 @@
+﻿@using PersonalSite.Service.ViewModel;
+
+@model PageViewModel
+
+@Html.EditorFor(m => m.DecodedPageContent, new { name = "DecodedPageContent", @class = "content-edit" })
+@Html.HiddenFor(m => m.PageId)
+@Html.HiddenFor(m => m.ParentArticleId, new { name = "ParentArticleId" })
+

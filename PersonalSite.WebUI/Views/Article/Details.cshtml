@@ -16,8 +16,9 @@
 @section Scripts {
     <script src=@Url.Content(string.Format("~/Scripts/menu.js")) type="text/javascript"></script>
     @*//?v={0}", DateTime.Now.ToString("ddMMyyyyhhmm"))) type="text/javascript"></script>*@
-    <script src="@Url.Content("~/Scripts/Paginate/jquery.paginate.js")" type="text/javascript"></script>
-    <script src="@Url.Content(string.Format("~/Scripts/Paginate/img.js"))" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/backoffice/jquery.article.paginate.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/Paginate/jquery.paginate.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/Paginate/img.js")" type="text/javascript"></script>
     @*//?v={0}", DateTime.Now.ToString("ddMMyyyyhh")))" type="text/javascript"></script>*@
     @if (Request.Browser.IsMobileDevice)
     {
