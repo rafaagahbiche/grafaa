@@ -7,6 +7,7 @@ namespace PersonalSite.Service.Concrete
     using PersonalSite.Service.ViewModel;
     using PersonalSite.Service.Extension;
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using Kaliko;
 
@@ -44,6 +45,28 @@ namespace PersonalSite.Service.Concrete
             {
                 yield return article.GetViewModel(false);
             }
+        }
+
+        public PageViewModel GetFirstPage(int id)
+        {
+            PageViewModel firstPageViewModel = null;
+            try
+            {
+                var pages = this.articlePageRepo.Where(x => x.Article.Id == id);
+                firstPageViewModel = pages.FirstOrDefault().GetViewModel();
+            }
+            catch (Exception ex)
+            {
+                Kaliko.Logger.Write(ex, Logger.Severity.Critical);
+            }
+
+            return firstPageViewModel;
+        }
+
+        public int PageCount(int id)
+        {
+            var articleObject = this.articleRepo.Get(id);
+            return articleObject.ArticlePages.Count;
         }
 
         public PageViewModel GetArticlePageById(int id)

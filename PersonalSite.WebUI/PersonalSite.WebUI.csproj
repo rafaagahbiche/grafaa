@@ -649,6 +649,7 @@
     <Content Include="Views\Shared\EditorTemplates\tinymce_jquery_full.cshtml" />
     <Content Include="Views\Article\EditPageInfos.cshtml" />
     <Content Include="Views\Article\DeleteArticlePage.cshtml" />
+    <Content Include="Views\Article\PageTab.cshtml" />
     <None Include="Web.Internet.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

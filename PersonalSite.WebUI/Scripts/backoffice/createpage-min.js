@@ -42,50 +42,103 @@ function showDeleteWarning(show) {
 }
 
 function callCreateArticlePageSync(url, pageViewModel) {
+    var oldPageId = pageViewModel.PageId;
     $.ajax({
         url: url,
         cache: false,
         type: "POST",
-        dataType: "json",
-        contentType: 'application/json',
-        data: JSON.stringify(pageViewModel),
-        success: function (result, textStatus) {
-            if (result !== null && result !== undefined) {
-                $('div#pageinfos').html(result.obj);
+        data: pageViewModel,
+        success: function (data) {
+            $('div#pageinfos').html(data);
+            if (oldPageId == -1) {
+                $('li.active').find('a').html($('li.tab').length);
+                AssignTabToEditor();
                 disableTabLinks(false);
-                switchLoading(false);
             }
+
+            switchLoading(false);
         },
-        error: function (result) {
-            if (result !== null && result !== undefined) {
-                $('div#pageinfos').html(result.responseText);
-                disableTabLinks(false);
-                switchLoading(false);
-            }
+        error: function (err) {
+            var x = 2;
         }
     });
 }
 
-
-var appendNewTabLink = function () {
-    var newTabLink = $("<a href='#tab-1'>New</a>");
-    var newLi = $("<li class='tab'></li>");
-    $(newLi).append(newTabLink);
-    $(tabLinksSelector).children('li.tab').last().after($(newLi).addClass('active'));
+var AssignTabToEditor = function () {
+    var newPageId = $('div#pageinfos').children('input#editPageId').val();
+    var link = $('li.tab').last().children('a')[0].href;
+    var oldPageId = link.substring(link.indexOf('=') + 1, link.indexOf('&'));
+    if (oldPageId == -1) {
+        $('li.tab').last().children('a')[0].href = link.replace(oldPageId, newPageId);
+    }
 }
 
-var initSaveArticlePageEvent = function () {
+var AddTabOnclick = function () {
+    $("a#tabplus").bind('click', function (e) {
+        $('ul#tabs').children('li.active').removeClass('active');
+        disableTabLinks(true);
+        var parentId = $('div#article').children('input#pagefuckingId').val();
+        $.ajax({
+            url: '/Article/AddNewTab',
+            type: "GET",
+            data: { articleId: parentId },
+            success: function (data) {
+                $(data).insertBefore('li.plus');
+            }
+        });
+
+        $.ajax({
+            url: '/Article/ShowPageContent',
+            type: "GET",
+            data: { pageId: -1, articleId: parentId },
+            success: function (data) {
+                $('div#tobeupdated').html(data);
+                initEventsForSelectedTab();
+            }
+        });
+
+        e.preventDefault();
+    });
+}
+
+var selectFocusTab = function () {
+    $('ul#tabs').children('li.active').removeClass('active');
+    $(this).parent().addClass('active');
+}
+
+var initEventsForSelectedTab = function () {
+    initSavePageEvent();
+    editDeleteEvent();
+}
+
+var initSavePageEvent = function () {
     $('a.save-page').bind('click', function (e) {
         $(loadingSelector).find('span').html("Saving page content...");
         switchLoading(true);
         var id = $('div#pageinfos').children('input[name="PageId"]').val();
-        var parentId = $('div#pageinfos').children('input[name="ParentArticleId"]').val();
+        var parentId = $('div#article').children('input#pagefuckingId').val();
         var contentToSend = tinymce.activeEditor.getContent();
         var pageViewModel = { PageId: id, ParentArticleId: parentId, PageContent: $('<div></div>').text(contentToSend).html() };
         callCreateArticlePageSync(this.href, pageViewModel);
         e.preventDefault();
-        // return false;
     });
+}
+
+var deleteCurrentTab = function () {
+    $('ul#tabs').find('li.active').remove();
+    var i = 1;
+    $('ul#tabs').children('li.tab').each(function () {
+        $(this).find('a').html(i);
+        i++;
+    });
+
+    $('ul#tabs').children('li:first-child').addClass('active');
+}
+
+var turnOffDeleteStyle = function () {
+    disableTabLinks(false);
+    showDeleteWarning(false);
+    deleteCurrentTab();
 }
 
 var editDeleteEvent = function () {
@@ -98,134 +151,16 @@ var editDeleteEvent = function () {
         disableTabLinks(false);
         showDeleteWarning(false);
     });
-
-    $('.edit-del-ok > a').bind('click', function () {
-        var idsContainer = $(hiddenBlocSelector).find("div.active").children("input[type='text']");
-        var pageId = -1;
-        if ($(idsContainer).val() !== "") {
-            pageId = $(idsContainer).val();
-        }
-
-        showDeleteWarning(false);
-        if (pageId !== "-1") {
-            $(loadingSelector).find('span').html("Deleting page...");
-            switchLoading(true);
-            var pageInfo = { id: pageId };
-            $.ajax({
-                url: $(this).attr('href'),
-                cache: false,
-                type: "POST",
-                data: pageInfo,
-                success: function (result, textStatus) {
-                    if (result !== null && result !== undefined && result.Status === true) {
-                        $(tabLinksSelector).children('li.active').remove();
-                        $(hiddenBlocSelector).children('div.active').remove();
-                        initFirstTabFirstText(true);
-                        initTabNumbers();
-                        disableTabLinks(false);
-                        switchLoading(false);
-                    }
-                }
-            });
-        }
-        else {
-            $(tabLinksSelector).children('li.active').remove();
-            $(hiddenBlocSelector).children('div.active').remove();
-            disableTabLinks(false);
-            initFirstTabFirstText(true);
-            initTabNumbers();
-        }
-        return false;
-    });
 }
 
 $(function () {
-    function OnSuccessArticlePageSync(id, idsContainer) {
-        $(idsContainer).val(id);
-        var articleDivId = $(idsContainer).parent().attr("id");
-        if (articleDivId === 'tab-1') {
-            $(idsContainer).val(id);
-            $(idsContainer).parent().attr("id", "tab" + id);
-            var activeLink = $(tabLinksSelector).children("li.active").children("a");
-            $(activeLink).attr("href", "#tab" + id);
-            $(activeLink).html($(tabLinksSelector).children("li").length - 1);
-        }
-        disableTabLinks(false);
-        switchLoading(false);
-    }
-
-    var initTabOnClick = function () {
-        $(tabLinksSelector).children('li.tab').each(function () {
-            $(this).children('a').on('click', function (e) {
-                var currentAttrValue = $(this).attr('href');
-                var contentText = $(currentAttrValue, hiddenBlocSelector).children('div').html();
-                $('textarea.content-edit').val(contentText);
-                tinyMCE.activeEditor.setContent(contentText);
-                $(currentAttrValue, hiddenBlocSelector).addClass('active').siblings().removeClass('active');
-                $(this).parent('li').addClass('active').siblings().removeClass('active');
-                e.preventDefault();
-            });
-        });
-    }
-
-    var initTabPlusOnclick = function () {
-        $('li.plus a').bind('click', function () {
-            var newTabLink = $("<a href='#tab-1'>New</a>");
-            $(newTabLink).on('click', function (e) {
-                var currentAttrValue = $(this).attr('href');
-                var contentText = $(hiddenBlocSelector + currentAttrValue).children('div').html();
-                tinyMCE.activeEditor.setContent(contentText);
-                $(hiddenBlocSelector + currentAttrValue).addClass('active').siblings().removeClass('active');
-                $(this).parent('li').addClass('active').siblings().removeClass('active');
-                e.preventDefault();
-            });
-
-            var newLi = $("<li class='tab'></li>");
-            $(newLi).append(newTabLink);
-            $(tabLinksSelector).children('li.active').removeClass('active');
-            $(tabLinksSelector).children('li.tab').last().after($(newLi).addClass('active'));
-            var baseHtml = "<div id='tab-1' class='active'><div></div><input type='text' value='-1'></input></div>";
-            $(hiddenBlocSelector).children('div.active').removeClass('active');
-            tinymce.activeEditor.setContent('');
-            $(hiddenBlocSelector).append(baseHtml);
-        });
-    }
-
-    var initEditArticlePageEvent = function() {
-        $('div.edit').bind('click', function () {
-            var preview = $(this).parent().parent();
-            var edit = $(preview).parent().children("div.page-edit");
-            $(preview).hide();
-            $(edit).show();
-        });
-    }
-
-    var initTabNumbers = function() {
-        var i = 0;
-        $(tabLinksSelector).children('li').each(function () {
-            var aHtml = $(this).children('a').html();
-            if (aHtml !== "New" && aHtml !== "&#x2B;" && aHtml !== "&#x31;" && aHtml !== "+") {
-                $(this).children('a').html(i + 1);
-            }
-            i++;
-        });
-    }
-
-    var initFirstTabFirstText = function (fillTinyMceEditor) {
-        $(hiddenBlocSelector).children('div').first().addClass('active');
-        $('li.tab').first().addClass('active');
-        var contentToRender = $(hiddenBlocSelector).children('div').first().children("div").html();
-        $('textarea.content-edit').val(contentToRender);
-        if (fillTinyMceEditor) {
-            tinyMCE.activeEditor.setContent(contentToRender);
-        }
-    }
-
     var init = function () {
+        AddTabOnclick();
         //loadTinyMce();
         //initFirstTabFirstText(false);
         //initTabOnClick();
-        initSaveArticlePageEvent();
+        initSavePageEvent();
+        editDeleteEvent();
         //initEditArticlePageEvent();
         //initTabPlusOnclick();
     }

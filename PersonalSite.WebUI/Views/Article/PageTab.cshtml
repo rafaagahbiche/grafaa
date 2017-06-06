@@ -1,0 +1,19 @@
+﻿@using PersonalSite.Service.ViewModel;
+@model PageViewModel
+
+@{var tabClass = (ViewData["count"] != null && (int)ViewData["count"] == 0) || Model.PageId == -1
+      ? "tab active" : "tab";}
+
+<li class="@tabClass">
+    @Ajax.ActionLink(ViewData["count"] != null ? ((int)ViewData["count"] + 1).ToString() : "New",
+        "ShowPageContent", new { pageId = Model.PageId, articleId = Model.ParentArticleId },
+        new AjaxOptions
+        {
+            HttpMethod = "GET",
+            InsertionMode = InsertionMode.Replace,
+            LoadingElementId = "ajaxloadingdata",
+            UpdateTargetId = "tobeupdated",
+            OnBegin = "selectFocusTab",
+            OnSuccess = "initEventsForSelectedTab"
+        })
+</li>

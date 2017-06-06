@@ -8,6 +8,8 @@ namespace PersonalSite.Service.Abstract
         ArticleViewModel Get(int id);
         PageViewModel GetArticlePageById(int id);
         IEnumerable<ArticleViewModel> GetAll();
+        PageViewModel GetFirstPage(int id);
+        int PageCount(int id);
         int Create(ArticleViewModel articleViewModel);
         int CreateArticlePage(PageViewModel articlePageViewModel);
         bool DeleteArticlePage(int id);

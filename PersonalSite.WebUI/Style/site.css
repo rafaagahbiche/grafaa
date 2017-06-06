@@ -302,7 +302,7 @@ div.article-page > div.page-edit > div {
 }
 
 div.article-page > div.page-edit > div:first-child { 
-    width: 9%;
+    width: 6%;
     margin: 0 0 0.3em 0;
     float:right;
 }

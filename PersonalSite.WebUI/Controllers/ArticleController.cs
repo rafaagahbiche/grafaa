@@ -19,15 +19,22 @@
             this.articleService = articleService;
         }
 
-        public ActionResult DeleteArticlePage(PageViewModel pageViewModel)
+        [HttpGet]
+        public PartialViewResult DeletePage(int pageId, int articleId)
         {
-            if (pageViewModel != null && pageViewModel.PageId > 0)
+            if (pageId > 0)
             {
-                articleService.DeleteArticlePage(pageViewModel.PageId);
-                return RedirectToAction("Edit", new { id = pageViewModel.ParentArticleId });
+                articleService.DeleteArticlePage(pageId);
             }
 
-            return View("Edit");
+            var pageCount = this.articleService.PageCount(articleId);
+            if (pageCount > 0)
+            {
+                var firstPageViewModel = this.articleService.GetFirstPage(articleId);
+                return PartialView("CreateArticlePage", firstPageViewModel);
+            }
+
+            return PartialView("CreateArticlePage", new PageViewModel() { PageId = -1, ParentArticleId = articleId });
         }
 
         [HttpGet]
@@ -38,23 +45,22 @@
             {
                 return PartialView("CreateArticlePage", pageViewModel);
             }
-            else
-            {
-                return PartialView("CreateArticlePage", new PageViewModel() { PageId = -1, ParentArticleId = articleId });
-            }
+
+            return PartialView("CreateArticlePage", new PageViewModel() { PageId = -1, ParentArticleId = articleId });
+        }
+
+        [HttpGet]
+        public PartialViewResult AddNewTab(int articleId)
+        {
+            return PartialView("PageTab", new PageViewModel() { PageId = -1, ParentArticleId = articleId });
         }
 
         [HttpPost]
-        public ActionResult CreateArticlePage(PageViewModel pageViewModel)
+        public PartialViewResult SavePage(PageViewModel pageViewModel)
         {
             if (pageViewModel == null || pageViewModel.PageId == 0)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError; 
-                return Json(new 
-                { 
-                    success = false, 
-                    responseText = "The view model is empty." 
-                }, JsonRequestBehavior.AllowGet);
+                return PartialView("EditPageInfos", new PageViewModel() { PageId = -1, ParentArticleId = -1 });
             }
 
             // Old article + New Page
@@ -63,46 +69,17 @@
                 pageViewModel.PageId = this.articleService.CreateArticlePage(pageViewModel);
                 if (pageViewModel.PageId == -1)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    return Json(new
-                    {
-                        success = false,
-                        responseText = "Something went wrong. Please reload the page."
-                    }, JsonRequestBehavior.AllowGet);
+                    return PartialView("EditPageInfos", new PageViewModel() { PageId = -1, ParentArticleId = -1 });
                 }
                 else
                 {
-                    var viewResult = this.RenderViewToString("EditPageInfos", pageViewModel);
-                    return Json(new 
-                    { 
-                        success = true, 
-                        responseText = "New page was created successfully",
-                        obj = viewResult
-                    }, JsonRequestBehavior.AllowGet);
+                    return PartialView("EditPageInfos", pageViewModel);
                 }
             }
             else
             {
                 var updateSucceeded = this.articleService.UpdatePageContent(pageViewModel);
-                if (updateSucceeded == false)
-                {
-                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    return Json(new
-                    {
-                        success = false,
-                        responseText = "Something went wrong. Please reload the page."
-                    }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    var viewResult = this.RenderViewToString("EditPageInfos", pageViewModel);
-                    return Json(new 
-                    { 
-                        success = true, 
-                        responseText = "Page was updated successfully.",
-                        obj = viewResult
-                    }, JsonRequestBehavior.AllowGet);
-                }
+                return PartialView("EditPageInfos", pageViewModel);
             }
         }
 

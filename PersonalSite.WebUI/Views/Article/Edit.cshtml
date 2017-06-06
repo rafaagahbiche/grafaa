@@ -8,11 +8,13 @@
 
 @{
     ViewBag.Title = "Edit";
+    ViewBag.TabCount = 0;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+
     <div class="form-horizontal">
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10 save">
@@ -21,7 +23,7 @@
         </div>
         <div id="article">
             @Html.ValidationSummary(true, string.Empty, new { @class = "text-danger" })
-            @Html.HiddenFor(model => model.Id)
+            <input type="hidden" value="@Model.Id" id="pagefuckingId" />
             @if (Model.PagesIds != null) {
                 for (var i = 0; i < Model.PagesIds.Count; i++)
                 {
@@ -46,57 +48,25 @@
         </div>
         <div class="form-group edit-pages">
             <div class="pages-tabs">
-                <ul class="tab-links">
+                <ul class="tab-links" id="tabs">
                 @if (Model != null && Model.ArticlePages != null)
                 {
                     if (Model.ArticlePages.Count > 0)
                     {
-                        for (int i = 0; i < Model.ArticlePages.Count; i++)
+                        for (int tabCount = 0; tabCount < Model.ArticlePages.Count; tabCount++)
                         {
-                            <li class="tab">
-                                @Ajax.ActionLink((Convert.ToInt32(i + 1)).ToString(),
-                                "ShowPageContent", new
-                                { pageId = Model.ArticlePages.ElementAt(i).PageId, articleId = Model.Id },
-                                new AjaxOptions
-                                {
-                                    HttpMethod = "GET",
-                                    LoadingElementId = "ajaxloading",
-                                    InsertionMode = InsertionMode.Replace,
-                                    UpdateTargetId = "tobeupdated",
-                                    OnSuccess = "initSaveArticlePageEvent"
-                                })
-                                @*<a href="@string.Format("#tab{0}", Model.ArticlePages.ElementAt(i).Id)">@Convert.ToInt32(i+1)</a>*@
-                            </li>
+                            ViewData["count"] = tabCount;
+                            { Html.RenderPartial("PageTab", Model.ArticlePages[tabCount]); }
                         }
                     }
                     else
                     {
-                        <li class="tab">
-                            @Ajax.ActionLink(@HttpUtility.HtmlDecode("&#x31;"),
-                                "ShowPageContent", new { pageId = -1, articleId = Model.Id },
-                                new AjaxOptions
-                                {
-                                    HttpMethod = "GET",
-                                    LoadingElementId = "ajaxloading",
-                                    InsertionMode = InsertionMode.Replace,
-                                    UpdateTargetId = "tobeupdated",
-                                    OnSuccess = "initSaveArticlePageEvent"
-                                })
-                        </li>
+                        ViewData["count"] = 0;
+                        { Html.RenderPartial("PageTab", new PageViewModel { PageId = -1, ParentArticleId = Model.Id }); }
                     }
                 }
                     <li class="plus">
-                    @*<a href="#tabplus">&#x2B;</a>*@
-                    @Ajax.ActionLink(@HttpUtility.HtmlDecode("&#x2B;").ToString(),
-                     "ShowPageContent", new { pageId = -1, articleId = Model.Id },
-                                new AjaxOptions
-                                {
-                                    HttpMethod = "GET",
-                                    LoadingElementId = "ajaxloading",
-                                    InsertionMode = InsertionMode.Replace,
-                                    UpdateTargetId = "tobeupdated",
-                                    OnSuccess = "initSaveArticlePageEvent"
-                                })
+                        <a id="tabplus" href="#">&#x2B;</a>
                     </li>
                 </ul>
             </div>

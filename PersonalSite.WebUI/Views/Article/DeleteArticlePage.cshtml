@@ -10,7 +10,17 @@
     </div>
     <div class="edit-del-butt">
         <div class="edit-del-ok">
-            @Html.ActionLink("Delete", "DeleteArticlePage", Model)
+            @Ajax.ActionLink("Delete",
+                         "DeletePage", 
+                new { pageId = Model.PageId, articleId = Model.ParentArticleId },
+                new AjaxOptions
+                {
+                    HttpMethod = "GET",
+                    InsertionMode = InsertionMode.Replace,
+                    LoadingElementId = "ajaxdeleting",
+                    UpdateTargetId = "tobeupdated",
+                    OnSuccess = "turnOffDeleteStyle"
+                })
         </div>
         <div class="edit-del-cancel">
             <span>Cancel</span>
@@ -18,5 +28,5 @@
     </div>
 </div>
 <div class="del-background"></div>
-<div class="loading hide-loading" id="ajaxloading"><div><span>Saving page content...</span></div></div>
+<div class="loading hide-loading" id="ajaxdeleting"><div><span>Deleting page...</span></div></div>
 

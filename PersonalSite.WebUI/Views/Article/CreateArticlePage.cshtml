@@ -1,22 +1,21 @@
 ﻿@using PersonalSite.Service.ViewModel;
 
 @model PageViewModel
-
-@*@{var tabId = string.Format("tab{0}", Model == null ? "0" : Model.Id.ToString());}*@
-      <div class="article-page">
-        <div class="page-edit">
-            <div class="save-page">
-                <a class="save-page" href="@Url.Action("CreateArticlePage")">
-                    <span class="icon-cloud-upload"></span>
-                </a>
-                <a class="delete-page" href="@Url.Action("DeleteArticlePage")">
-                    <span class="icon-bin delete-page"></span>
-                </a>
-            </div>
-            <div id="pageinfos">
-                @{ Html.RenderPartial("EditPageInfos", Model); }
-            </div>
+<div class="article-page">
+    <div class="page-edit">
+        <div class="save-page">
+            <a class="save-page" href="@Url.Action("SavePage")">
+                <span class="icon-cloud-upload"></span>
+            </a>
+            <a class="delete-page">
+                <span class="icon-bin delete-page"></span>
+            </a>
         </div>
-        @{ Html.RenderPartial("DeleteArticlePage", Model); }
-        <div class="loading hide-loading" id="ajaxloading"><div><span>Saving page content...</span></div></div>
-    </div> 
+        <div id="pageinfos">
+            @{ Html.RenderPartial("EditPageInfos", Model); }
+        </div>
+    </div>
+    @{ Html.RenderPartial("DeleteArticlePage", Model); }
+    <div class="loading hide-loading" id="ajaxloading"><div><span>Saving page content...</span></div></div>
+    <div class="loading hide-loading" id="ajaxloadingdata"><div><span>Loading data...</span></div></div>
+</div> 
